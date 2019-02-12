@@ -1,0 +1,7 @@
+.*
+!.gitignore
+*.o
+*.o.*
+*.su
+*.map
+loader
