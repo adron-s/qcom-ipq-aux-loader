@@ -75,6 +75,17 @@ void serial_putc(char c){
 	unsigned int base = UART1_DM_BASE;
 	unsigned int num_of_chars = 1;
 	unsigned int tx_word = 0;
+
+	/* Write to NO_CHARS_FOR_TX register number of characters
+	 * to be transmitted. However, before writing TX_FIFO must
+	 * be empty as indicated by TX_READY interrupt in IMR register
+	 *
+	 * Check if transmit FIFO is empty.
+	 * If not we'll wait for TX_READY interrupt. */
+	if(!(readl(MSM_BOOT_UART_DM_SR(base)) & MSM_BOOT_UART_DM_SR_TXEMT)){
+		while(!(readl(MSM_BOOT_UART_DM_ISR(base)) & MSM_BOOT_UART_DM_TX_READY));
+	}
+
 	/* We are here. FIFO is ready to be written. */
 	/* Write number of characters to be written */
 	writel(num_of_chars, MSM_BOOT_UART_DM_NO_CHARS_FOR_TX(base));
@@ -86,10 +97,9 @@ void serial_putc(char c){
 	while(!(readl(MSM_BOOT_UART_DM_SR(base)) & MSM_BOOT_UART_DM_SR_TXRDY));
 	if(c == '\n'){
 		/* Replace linefeed char "\n" with carriage return + linefeed "\r\n". */
-		/* tx_word = '\r';
+		tx_word = '\r';
 		tx_word <<= 8;
-		tx_word |= '\n'; */
-		tx_word = c; /* We need only one char */
+		tx_word |= '\n';
 	}else{
 		tx_word = c; /* We need only one char */
 	}

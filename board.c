@@ -3,7 +3,7 @@
 #include "io.h"
 #include "types.h"
 #include "config.h"
-#include "kernel_tags.h"
+//#include "kernel_tags.h"
 
 /*
  * Compression Types
@@ -103,57 +103,98 @@ void board_init_f(unsigned long bootflag)
 	//reset_cpu(0);
 	//writel(1, APCS_WDT0_RST);
 	//printf("\n");
+	//TODO: setup 30 sec watchdog ! Do not disable it finally !
 	writel(0, WDT_EN);
 	writel(1, WDT_RST);
-	serial_putc('0');
-	/* while(1){
-		if(z % 10000 == 0){
-			for(a = 0; a < 9; a++)
-				serial_putc('0' + a);
-			serial_putc('-');
-			serial_putc('0' + ((z / 10000) & 7));
-			serial_putc('\r');
-			serial_putc('\n');
+
+	printf("\n");
+	printf("TEXT_BASE = 0x%08X\n", CONFIG_SYS_TEXT_BASE);
+	//reset_cpu(0);
+	/* printf("sp = 0x%x\n", CONFIG_SYS_INIT_SP_ADDR);
+	printf("boot_params = 0x%x\n", boot_params);
+	printf("boot_param[0] = %x\n", boot_params[0]);
+	printf("boot_param[1] = %x\n", boot_params[1]);
+	printf("boot_param[2] = %x\n", boot_params[2]);
+	printf("boot_param[3] = %x\n", boot_params[3]); 
+	printf("\n"); */
+
+	/* if(0){
+		struct tag *t;
+		for_each_tag(t, ((void*)boot_params[2])){
+			printf("tt = %x\n", t);
+			printf("size = %d\n", t->hdr.size);
+			printf("tag = 0x%x\n", t->hdr.tag);
+			if(0 && t->hdr.tag == ATAG_CMDLINE){
+				//printf("cmdline: %s\n", t->u.cmdline.cmdline);
+				char buf[128];
+				char *p = t->u.cmdline.cmdline;
+				char *r = buf;
+				printf("Kernel cmdline:\n");
+				while(1){
+					if(*p == ' ' || *p == '\0'){
+						if(*p == ' '){
+							*r = '\0';
+							r = buf;
+							printf("  %s\n", r);
+							p++;
+							continue;
+						}
+						if(*p == '\0'){
+							break;
+						}
+					}else{
+						*r = *p;
+						r++; p++;
+					}
+				}
+			}
 		}
-		z++;
-		if(z > 1000 * 10000)
-			reset_cpu(0);
-		//serial_putc('\r');
+		//printf("\n");
 	} */
+	printf("\n");
+
 	{
 		image_header_t *image = (void*)_kernel_data_start;
 		unsigned char *p = (void*)_kernel_data_start + sizeof(image_header_t);
 		unsigned char *k = (void*)ntohl(image->ih_load);
+		u32 rlen = ntohl(image->ih_size);
+		u32 alen = _kernel_data_end  - _kernel_data_start;
+		u32 magic = ntohl(image->ih_magic);
+		printf("Kernel header:\n");
+		printf("  ih_magic = %x. magic %s\n", magic,
+			magic == IH_MAGIC ? "OK" : "Unknown!!!");
+		printf("  ih_size = %u\n", rlen);
+		printf("  ih_name = '%s'\n", image->ih_name);
+		/* printf("kernel_data_start = 0x%x\n", _kernel_data_start);
+		printf("kernel_data_end = 0x%x\n", _kernel_data_end);
+		printf("  ih_load = 0x%08x\n", ntohl(image->ih_load));
+		printf("  ih_ep = 0x%08x\n", ntohl(image->ih_ep)); */
+		if(alen - sizeof(image_header_t) < rlen){
+			printf("WARNING ! Kernel sizes mismath detected !\n");
+		}
 		//reset_cpu(0);
-		serial_putc('1');
-		if(ntohl(image->ih_magic) != IH_MAGIC)
-			serial_putc('!');
+		printf("\n");
+		printf("Copy kernel...");
 		for(; (void*)p < (void*)_kernel_data_end; p++, k++){
 			*k = *p;
 		}
-		serial_putc('2');
-		//reset_cpu(0);
+		printf("Done\n");
 		kernel_entry = (void*)ntohl(image->ih_ep);
 	}
-	printf("!%x!", kernel_entry);
-	serial_putc('3');
+	printf("Starting kernel at 0x%08x\n", kernel_entry);
+	printf("\n");
+	//kernel_entry(0, boot_params[1], boot_params[2]);
 	cleanup_before_linux();
 	kernel_entry(0, 4200, 0);
-	//kernel_entry(0, 1068, 0);
 	reset_cpu(0);
 }
 
 void save_boot_params_default(u32 r0, u32 r1, u32 r2, u32 r3)
 {
-	/* boot_params[0] = r0;
+/*	boot_params[0] = r0;
 	boot_params[1] = r1;
 	boot_params[2] = r2;
 	boot_params[3] = r3; */
-	/* if(r1 == 4200){
-		serial_putc('a');
-	}else{
-		serial_putc('b');
-	} */
 }
 
 void save_boot_params(u32 r0, u32 r1, u32 r2, u32 r3)

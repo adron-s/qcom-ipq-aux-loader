@@ -9,7 +9,7 @@
 //#define CONFIG_MAX_RAM_BANK_SIZE        CONFIG_SYS_SDRAM_SIZE
 //#define CONFIG_SYS_LOAD_ADDR            (CONFIG_SYS_SDRAM_BASE + (64 << 20))
 
-/* 30Mb stack pointer offset TEXT_BASE <---<<- SP */
+/* 30Mb stack pointer offset TEXT_BASE <--OUR Loader--<<--30Mb--<< SP */
 #define CONFIG_SYS_INIT_SP_ADDR (CONFIG_SYS_TEXT_BASE + 0x1E00000)
 //#define CONFIG_SYS_INIT_SP_ADDR (0x87300000)
 /* #define CONFIG_SYS_INIT_SP_ADDR         CONFIG_SYS_SDRAM_BASE + \
