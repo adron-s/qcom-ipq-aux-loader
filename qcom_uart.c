@@ -71,8 +71,14 @@
 #define MSM_BOOT_UART_DM_RXBREAK_END         (1 << 11)
 #define MSM_BOOT_UART_DM_PAR_FRAME_ERR_IRQ   (1 << 12)
 
+#ifdef CONFIG_IPQ806X
+#define UARTx_DM_BASE UART7_DM_BASE
+#else
+#define UARTx_DM_BASE UART1_DM_BASE
+#endif /* CONFIG_IPQ806X */
+
 void serial_putc(char c){
-	unsigned int base = UART1_DM_BASE;
+	unsigned int base = UARTx_DM_BASE;
 	unsigned int num_of_chars = 1;
 	unsigned int tx_word = 0;
 
