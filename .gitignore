@@ -6,3 +6,5 @@
 *.map
 loader
 *.bin
+./ubi/ubi-rootdir
+./ubi/*.ubi*
