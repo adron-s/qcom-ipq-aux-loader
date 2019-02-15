@@ -41,10 +41,6 @@
 #define GPIO_CONFIG_ADDR(x) (TLMM_BASE + (x)*0x1000)
 #define GPIO_IN_OUT_ADDR(x) (TLMM_BASE + 0x4 + (x)*0x1000)
 
-#define WDT_BASE 		0xB017000
-#define WDT_RST    (WDT_BASE + 0x4)
-#define WDT_EN    (WDT_BASE + 0x8)
-
 #define GCNT_PSHOLD		0x004AB000
 
 #endif /* _PLATFORM_IPQ40XX_IOMAP_H_ */

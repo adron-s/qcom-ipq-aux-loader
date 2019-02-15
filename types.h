@@ -10,4 +10,6 @@ typedef unsigned short u16;
 
 typedef unsigned long ulong;
 
+#define NULL 0
+
 #endif /* __TYPES_MINI_H */

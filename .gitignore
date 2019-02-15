@@ -5,6 +5,7 @@
 *.su
 *.map
 loader
+loader.elf
 *.bin
-./ubi/ubi-rootdir
-./ubi/*.ubi*
+ubi/ubi-rootdir
+ubi/*.ubi*

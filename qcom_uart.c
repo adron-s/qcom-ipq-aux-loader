@@ -112,3 +112,16 @@ void serial_putc(char c){
 	/* TX FIFO has space. Write the chars */
 	writel(tx_word, MSM_BOOT_UART_DM_TF(base, 0));
 }
+
+/*
+//for HEAD loader debug
+#include "printf.h"
+#include "types.h"
+void owl_debug(u32 r0, u32 r1, u32 r2){
+	printf("Hello OWL! 0x%x, 0x%x, 0x%x\n", r0, r1, r2);
+}
+int raise (int signum)
+{
+	return 0;
+}
+*/

@@ -54,7 +54,7 @@ typedef struct image_info {
 } image_info_t;
 
 //u32 *boot_params = (void*)(CONFIG_SYS_INIT_SP_ADDR + 0x6400000);
-u32 *boot_params = (void*)(CONFIG_SYS_INIT_SP_ADDR + 0x1400000);
+//u32 *boot_params = (void*)(CONFIG_SYS_INIT_SP_ADDR + 0x1400000);
 
 int cleanup_before_linux(void);
 
@@ -90,8 +90,7 @@ void reset_cpu(ulong addr)
 	while (1);
 }
 
-
-void board_init_f(unsigned long bootflag)
+void board_init_f(u32 pc, u32 r2)
 {
 	extern char _kernel_data_start[];
 	extern char _kernel_data_end[];
@@ -100,15 +99,19 @@ void board_init_f(unsigned long bootflag)
 	/* compiler optimization barrier needed for GCC >= 3.4 */
 	__asm__ __volatile__("": : :"memory");
 
-	//reset_cpu(0);
 	//writel(1, APCS_WDT0_RST);
 	//printf("\n");
-	//TODO: setup 30 sec watchdog ! Do not disable it finally !
-	writel(0, WDT_EN);
-	writel(1, WDT_RST);
 
 	printf("\n");
 	printf("TEXT_BASE = 0x%08X\n", CONFIG_SYS_TEXT_BASE);
+	printf("pc = 0x%08X\n", pc);
+	printf("_start(r2) = 0x%08X\n", r2);
+	printf("_kernel_data_start = 0x%08X\n", _kernel_data_start);
+	printf("_kernel_data_end = 0x%08X\n", _kernel_data_end);
+
+	//reset_cpu(0);
+	//printf("\n");
+
 	//reset_cpu(0);
 	/* printf("sp = 0x%x\n", CONFIG_SYS_INIT_SP_ADDR);
 	printf("boot_params = 0x%x\n", boot_params);
@@ -175,9 +178,10 @@ void board_init_f(unsigned long bootflag)
 		//reset_cpu(0);
 		printf("\n");
 		printf("Copy kernel...");
-		for(; (void*)p < (void*)_kernel_data_end; p++, k++){
+		for(; (void*)p + 4 <= (void*)_kernel_data_end; p += 4, k += 4)
+			*((u32*)k) = *((u32*)p);
+		for(; (void*)p < (void*)_kernel_data_end; p++, k++)
 			*k = *p;
-		}
 		printf("Done\n");
 		kernel_entry = (void*)ntohl(image->ih_ep);
 	}
