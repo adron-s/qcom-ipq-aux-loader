@@ -74,6 +74,7 @@ jump_2_ram:
 	mcr     p15, 0, r0, c12, c0, 0  @Set VBAR
 
 	ldr	r0, =(CONFIG_SYS_TEXT_BASE)
+	mov r1, r5 /* REAL _start addr */
 	/* jump to it ... */
 	mov	pc, r0
 

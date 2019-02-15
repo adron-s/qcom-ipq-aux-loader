@@ -90,7 +90,7 @@ void reset_cpu(ulong addr)
 	while (1);
 }
 
-void board_init_f(u32 pc, u32 r2)
+void board_init_f(u32 real_text_base)
 {
 	extern char _kernel_data_start[];
 	extern char _kernel_data_end[];
@@ -104,10 +104,9 @@ void board_init_f(u32 pc, u32 r2)
 
 	printf("\n");
 	printf("TEXT_BASE = 0x%08X\n", CONFIG_SYS_TEXT_BASE);
-	printf("pc = 0x%08X\n", pc);
-	printf("_start(r2) = 0x%08X\n", r2);
-	printf("_kernel_data_start = 0x%08X\n", _kernel_data_start);
-	printf("_kernel_data_end = 0x%08X\n", _kernel_data_end);
+	printf("real_text_base = 0x%08X\n", real_text_base);
+	printf("kernel_data_start = 0x%08X\n", _kernel_data_start);
+	printf("kernel_data_end = 0x%08X\n", _kernel_data_end);
 
 	//reset_cpu(0);
 	//printf("\n");
@@ -193,24 +192,13 @@ void board_init_f(u32 pc, u32 r2)
 	reset_cpu(0);
 }
 
-void save_boot_params_default(u32 r0, u32 r1, u32 r2, u32 r3)
-{
-/*	boot_params[0] = r0;
-	boot_params[1] = r1;
-	boot_params[2] = r2;
-	boot_params[3] = r3; */
-}
-
-void save_boot_params(u32 r0, u32 r1, u32 r2, u32 r3)
-	__attribute__((weak, alias("save_boot_params_default")));
-
 void hang(void)
 {
 	printf("### ERROR ### Please RESET the board ###\n");
 	for (;;);
 }
 
-int raise (int signum)
+int raise(int signum)
 {
 	/* Needs for div/mod ops */
 	printf("raise: Signal # %d caught\n", signum);
