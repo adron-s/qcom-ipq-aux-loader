@@ -1,4 +1,4 @@
-#include "types.h"
+#include <types.h>
 
 #define CR_C	(1 << 2)	/* Dcache enable			*/
 #define CR_I	(1 << 12)	/* Icache enable			*/

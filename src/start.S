@@ -1,5 +1,3 @@
-#include "config.h"
-
 .globl _start
 _start:
 	mov r7, r1 @save REAL _start addr
@@ -19,7 +17,8 @@ clbss_e:
 
 /* Set stackpointer in internal RAM to call board_init_f */
 call_board_init_f:
-	ldr	sp, =(CONFIG_SYS_INIT_SP_ADDR)
+	/* stack grows left! <--SP--TEXT_BASE,_start--END of program */
+	ldr	sp, =(CONFIG_SYS_TEXT_BASE)
 	bic	sp, sp, #7 /* 8-byte alignment for ABI compliance */
 	mov r0, r7
 	bl	board_init_f

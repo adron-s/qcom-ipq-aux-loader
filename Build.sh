@@ -24,9 +24,10 @@ TEXT_BASE=0x87300000 #realloc memory address
 #TEXT_BASE=0xc0000000
 #TEXT_BASE=0xc1200000
 
-#TEXT_BASE2=0x80000000
+TEXT_BASE2=0x00000000 #for fat kernels <= 12M
+#TEXT_BASE2=0x80000000 #for fat kernels <= 12M
 #TEXT_BASE2=0x81820000
-TEXT_BASE2=0x01100000 #RouterBOOT auto realloc flag value address
+#TEXT_BASE2=0x01100000 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
 
 OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
 export STAGING_DIR=${OPENWRT_DIR}/staging_dir
@@ -37,7 +38,7 @@ export PATH=${TOOLPATH}/bin:${PATH}
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-glinet_gl-b1300-initramfs-uImage
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-compex_wpj428-initramfs-uImage
 KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-uImage
-#KERNEL_IMAGE=${OPENWRT_DIR}/build_dir/target-arm_cortex-a7+neon-vfpv4_musl_eabi/linux-ipq40xx/
+#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-fit-uImage.itb
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-engenius_eap1300-initramfs-uImage
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-zyxel_wre6606-initramfs-uImage
 
@@ -49,53 +50,51 @@ CFLAGS="-g -Os -fno-common -ffixed-r8 -D__KERNEL__ -DCONFIG_SYS_TEXT_BASE=${TEXT
 CFLAGS2="-fno-builtin -ffreestanding -nostdinc"
 CFLAGS3="-pipe -DCONFIG_ARM -D__ARM__ -fPIC -marm -mno-thumb-interwork -mabi=aapcs-linux -march=armv7-a -mno-unaligned-access"
 CFLAGS4="-Wall -Wstrict-prototypes -fno-stack-protector -Wno-format-nonliteral -Wno-format-security -fstack-usage"
+INCLUDE="-I./include"
 GCC_SYSTEM="$TOOLPATH/lib/gcc/arm-openwrt-linux-muslgnueabi/7.4.0"
 ISYSTEM="-isystem ${GCC_SYSTEM}/include"
 
-$CC -D__ASSEMBLY__ $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 -o start.o start.S -c
+$CC -D__ASSEMBLY__ $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 -o bin/start.o src/start.S -c
 
-$CC $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 $CFLAGS4 -o board.o board.c -c
-$CC $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 $CFLAGS4 -o cpu.o cpu.c -c
-$CC $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 $CFLAGS4 -o qcom_uart.o qcom_uart.c -c
-$CC $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 $CFLAGS4 -o printf.o printf.c -c
-$CC $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 $CFLAGS4 -o watchdog.o watchdog.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/board.o src/board.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/cpu.o src/cpu.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/qcom_uart.o src/qcom_uart.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/printf.o src/printf.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/watchdog.o src/watchdog.c -c
 
 #echo $KERNEL_IMAGE
 #test for fat images
 #cat $KERNEL_IMAGE > ./b1.bin
-#dd if=$KERNEL_IMAGE bs=1k count=3400 >> ./b1.bin
+#dd if=$KERNEL_IMAGE bs=1k count=2000 >> ./b1.bin
 #cat $KERNEL_IMAGE >> ./b1.bin
 #cat $KERNEL_IMAGE >> ./b1.bin
 #cat $KERNEL_IMAGE >> ./b1.bin
 #KERNEL_IMAGE=./b1.bin
 O_FORMAT=$($OBJDUMP -i | head -2 | grep elf32)
-#$LD -r -b binary --oformat ${O_FORMAT} -T kernel-data.lds -o ./data.o ${KERNEL_IMAGE}
-#KERNEL_IMAGE=./hello.txt
-$LD -r -b binary -T kernel-data.lds -o ./data.o ${KERNEL_IMAGE}
+$LD -r -b binary -T src/kernel-data.lds -o bin/data.o ${KERNEL_IMAGE}
 
-$LD -pie -T loader.lds -Bstatic -Ttext ${TEXT_BASE} start.o \
-	--start-group ./board.o ./printf.o ./qcom_uart.o ./cpu.o \
-	./data.o \
+$LD -pie -T src/loader.lds -Bstatic -Ttext ${TEXT_BASE} bin/start.o \
+	--start-group bin/board.o bin/printf.o bin/qcom_uart.o bin/cpu.o \
+	bin/watchdog.o bin/data.o \
 	-L ${GCC_SYSTEM} \
-	-lgcc -Map loader.map -o loader
+	-lgcc -Map bin/loader.map -o bin/loader
 
-#${OBJCOPY} --only-section=.bss -S ./loader ./loader.slim
-#${OBJCOPY} -R .text -R .data -R .ARM.attributes -R .comment -R .debug.* -S ./loader ./loader.slim
-#${OBJDUMP} -x ./loader.slim > ./loader.slim.headers
-#${OBJDUMP} -x ./loader > ./loader.headers
-#${OBJDUMP} -D ./start.o > ./start.asm
-#${OBJDUMP} -b binary -m arm -D ./loader.bin > ./loader.bin.asm
-#${OBJDUMP} start.o -D > ./start.o.asm
+#${OBJCOPY} --only-section=.bss -S bin/loader bin/loader.slim
+#${OBJCOPY} -R .text -R .data -R .ARM.attributes -R .comment -R .debug.* -S bin/loader bin/loader.slim
+#${OBJDUMP} -x bin/loader.slim > bin/loader.slim.headers
+#${OBJDUMP} -x bin/loader > bin/loader.headers
+#${OBJDUMP} -D bin/start.o > ./start.asm
+#${OBJDUMP} -b binary -m arm -D bin/loader.bin > ./loader.bin.asm
+#${OBJDUMP} bin/start.o -D > ./start.o.asm
 
-${OBJCOPY} -O binary -R .reginfo -R .note -R .comment -R .mdebug -R .MIPS.abiflags -S ./loader ./loader.bin
-${LD} -r -b binary --oformat ${O_FORMAT} -o loader2.o loader.bin
-$CC -D__ASSEMBLY__ $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 -o head.o head.S -c
-# qcom_uart.o printf.o -L ${GCC_SYSTEM} -lgcc
-${LD} -e startup -T loader2.lds -Ttext ${TEXT_BASE2} -o loader.elf loader2.o head.o watchdog.o \
-	-Map loader2.map
+${OBJCOPY} -O binary -R .reginfo -R .note -R .comment -R .mdebug -R .MIPS.abiflags -S bin/loader bin/loader.bin
+${LD} -r -b binary --oformat ${O_FORMAT} -o bin/loader2.o bin/loader.bin
+$CC -D__ASSEMBLY__ $CFLAGS $CFLAGS2 $ISYSTEM $CFLAGS3 -o bin/head.o src/head.S -c
+# bin/qcom_uart.o bin/printf.o -L ${GCC_SYSTEM} -lgcc
+${LD} -e startup -T src/loader2.lds -Ttext ${TEXT_BASE2} -o bin/loader.elf bin/loader2.o \
+	bin/head.o bin/watchdog.o -Map bin/loader2.map
 
-#${OBJCOPY} -O binary -R .text -R .ARM.attributes -R .comment -R .debug.* -S ./loader.elf ./loader.elf.bin
+#${OBJCOPY} -O binary -R .text -R .ARM.attributes -R .comment -R .debug.* -S bin/loader.elf bin/loader.elf.bin
 #${OBJDUMP} -x ./loader.elf > ./loader.elf.headers
-#${OBJCOPY} -R .data -R .ARM.attributes -R .comment -R .debug.* -S ./loader.elf ./loader.elf.X
-#${OBJDUMP} -x ./loader.elf.X > ./loader.elf.X.headers
-
+#${OBJCOPY} -R .data -R .ARM.attributes -R .comment -R .debug.* -S bin/loader.elf bin/loader.elf.X
+#${OBJDUMP} -x bin/loader.elf.X > ./loader.elf.X.headers

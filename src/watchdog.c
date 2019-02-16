@@ -1,4 +1,4 @@
-#include "io.h"
+#include <io.h>
 
 #ifdef CONFIG_IPQ4XXX
 #define WDT_BASE 		0xB017000
@@ -10,12 +10,16 @@
 
 #define WDT_RESETUP_PERIOD 10
 
-void watchdog_resetup(void){
+void watchdog_setup(int period){
 	writel(0, WDT_EN);
 	writel(1, WDT_RST);
-	writel(WDT_RESETUP_PERIOD * 65536, WDT_BARK_TIME);
-	writel(WDT_RESETUP_PERIOD * 65536, WDT_BITE_TIME);
+	writel(period * 65536, WDT_BARK_TIME);
+	writel(period * 65536, WDT_BITE_TIME);
 	writel(1,  WDT_EN);
+}
+
+void watchdog_resetup(void){
+	watchdog_setup(WDT_RESETUP_PERIOD);
 }
 
 #endif /* CONFIG_IPQ4XXX */

@@ -9,7 +9,7 @@
  *
  */
 
-#include	"printf.h"
+#include	<printf.h>
 
 extern void serial_putc(char c);
 
