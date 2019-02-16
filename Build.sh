@@ -50,7 +50,7 @@ CFLAGS="-g -Os -fno-common -ffixed-r8 -D__KERNEL__ -DCONFIG_SYS_TEXT_BASE=${TEXT
 CFLAGS2="-fno-builtin -ffreestanding -nostdinc"
 CFLAGS3="-pipe -DCONFIG_ARM -D__ARM__ -fPIC -marm -mno-thumb-interwork -mabi=aapcs-linux -march=armv7-a -mno-unaligned-access"
 CFLAGS4="-Wall -Wstrict-prototypes -fno-stack-protector -Wno-format-nonliteral -Wno-format-security -fstack-usage"
-INCLUDE="-I./include"
+INCLUDE="-I./src/include"
 GCC_SYSTEM="$TOOLPATH/lib/gcc/arm-openwrt-linux-muslgnueabi/7.4.0"
 ISYSTEM="-isystem ${GCC_SYSTEM}/include"
 
@@ -61,6 +61,7 @@ $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/cpu.o src/cpu.c 
 $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/qcom_uart.o src/qcom_uart.c -c
 $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/printf.o src/printf.c -c
 $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/watchdog.o src/watchdog.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/loader.o src/loader.c -c
 
 #echo $KERNEL_IMAGE
 #test for fat images
@@ -74,8 +75,8 @@ O_FORMAT=$($OBJDUMP -i | head -2 | grep elf32)
 $LD -r -b binary -T src/kernel-data.lds -o bin/data.o ${KERNEL_IMAGE}
 
 $LD -pie -T src/loader.lds -Bstatic -Ttext ${TEXT_BASE} bin/start.o \
-	--start-group bin/board.o bin/printf.o bin/qcom_uart.o bin/cpu.o \
-	bin/watchdog.o bin/data.o \
+	--start-group bin/loader.o bin/printf.o bin/qcom_uart.o bin/cpu.o \
+	bin/board.o bin/watchdog.o bin/data.o \
 	-L ${GCC_SYSTEM} \
 	-lgcc -Map bin/loader.map -o bin/loader
 

@@ -15,13 +15,13 @@ clbss_l:
 	b	clbss_l
 clbss_e:
 
-/* Set stackpointer in internal RAM to call board_init_f */
-call_board_init_f:
+/* Set stackpointer in internal RAM to call loader_main */
+call_loader_main:
 	/* stack grows left! <--SP--TEXT_BASE,_start--END of program */
 	ldr	sp, =(CONFIG_SYS_TEXT_BASE)
 	bic	sp, sp, #7 /* 8-byte alignment for ABI compliance */
 	mov r0, r7
-	bl	board_init_f
+	bl	loader_main
 
 .globl owl_get_sp
 owl_get_sp:

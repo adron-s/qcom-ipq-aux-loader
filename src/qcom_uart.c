@@ -1,6 +1,20 @@
+/*
+ * Auxiliary kernel loader for Qualcom IPQ-4XXX/806X based boards
+ *
+ * Copyright (C) 2019 Sergey Sergeev <adron@mstnt.com>
+ *
+ * Some structures and code has been taken from the U-Boot project.
+ *	(C) Copyright 2008 Semihalf
+ *	(C) Copyright 2000-2005
+ *	Wolfgang Denk, DENX Software Engineering, wd@denx.de.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 as published
+ * by the Free Software Foundation.
+ */
+
 #include <iomap.h>
 #include <io.h>
-
 
 /* Number of characters for Transmission */
 #define MSM_BOOT_UART_DM_NO_CHARS_FOR_TX(base) ((base) + 0x040)
