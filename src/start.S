@@ -2,6 +2,14 @@
 _start:
 	mov r7, r1 @save REAL _start addr
 
+	/*
+	 * set the cpu to SVC32 mode
+	 */
+	mrs	r0, cpsr
+	bic	r0, r0, #0x1f
+	orr	r0, r0, #0xd3
+	msr	cpsr,r0
+
 /* Lets clear a bss */
 clear_bss:
 	ldr	r0, =_bss_start

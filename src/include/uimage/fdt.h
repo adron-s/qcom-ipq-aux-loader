@@ -56,7 +56,7 @@ struct fdt_property {
 
 #endif /* !__ASSEMBLY */
 
-#define FDT_IH_MAGIC	0xd00dfeed	/* 4: version, 4: total size */
+#define FDT_MAGIC	0xd00dfeed	/* 4: version, 4: total size */
 #define FDT_TAGSIZE	sizeof(uint32_t)
 
 #define FDT_BEGIN_NODE	0x1		/* Start node: full name */

@@ -17,6 +17,7 @@
 #define __LEGACY_H__
 
 #define LEGACY_IH_MAGIC	0x27051956	/* LEGACY Magic Number		*/
+#define FIT_IH_MAGIC	0xd00dfeed	/* FIT Magic Number */
 #define LEGACY_IH_NMLEN		32	/* LEGACY Name Length		*/
 
 /*

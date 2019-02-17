@@ -282,6 +282,22 @@ void clear_l2cache_err(void)
 #endif
 }
 
+/* cache_bit must be either CR_I or CR_C */
+static void cache_enable(uint32_t cache_bit)
+{
+	uint32_t reg;
+
+	reg = get_cr();	/* get control reg. */
+	cp_delay();
+	set_cr(reg | cache_bit);
+}
+void enable_caches(void)
+{
+#if defined CONFIG_IPQ4XXX
+	cache_enable(CR_I);
+#endif
+}
+
 void invalidate_dcache_all(void)
 {
 	v7_maint_dcache_all(ARMV7_DCACHE_INVAL_ALL);

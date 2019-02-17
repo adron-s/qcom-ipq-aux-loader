@@ -37,8 +37,8 @@ export PATH=${TOOLPATH}/bin:${PATH}
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-8dev_jalapeno-initramfs-uImage
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-glinet_gl-b1300-initramfs-uImage
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-compex_wpj428-initramfs-uImage
-KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-uImage
-#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-fit-uImage.itb
+#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-uImage
+KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-fit-uImage.itb
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-engenius_eap1300-initramfs-uImage
 #KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-zyxel_wre6606-initramfs-uImage
 
@@ -61,6 +61,9 @@ $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/cpu.o src/cpu.c 
 $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/qcom_uart.o src/qcom_uart.c -c
 $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/printf.o src/printf.c -c
 $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/watchdog.o src/watchdog.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/fdt.o src/fdt.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/LzmaDecode.o src/LzmaDecode.c -c
+$CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/lzma.o src/lzma.c -c
 $CC $CFLAGS $CFLAGS2 $INCLUDE $ISYSTEM $CFLAGS3 $CFLAGS4 -o bin/loader.o src/loader.c -c
 
 #echo $KERNEL_IMAGE
@@ -76,7 +79,7 @@ $LD -r -b binary -T src/kernel-data.lds -o bin/data.o ${KERNEL_IMAGE}
 
 $LD -pie -T src/loader.lds -Bstatic -Ttext ${TEXT_BASE} bin/start.o \
 	--start-group bin/loader.o bin/printf.o bin/qcom_uart.o bin/cpu.o \
-	bin/board.o bin/watchdog.o bin/data.o \
+	bin/board.o bin/watchdog.o bin/fdt.o bin/LzmaDecode.o bin/lzma.o bin/data.o \
 	-L ${GCC_SYSTEM} \
 	-lgcc -Map bin/loader.map -o bin/loader
 

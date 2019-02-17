@@ -14,4 +14,6 @@ SECTIONS {
 	}
 	. = ALIGN(32);
 	_bss_end = .;
+	. = ALIGN(32);
+	workspace = .;
 }
