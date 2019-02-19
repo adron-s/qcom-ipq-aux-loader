@@ -3,11 +3,14 @@ startup:
 	mov r7, pc @save REAL _start addr
 	sub	r7, r7, #8
 
+	mov r6, r1 @save ARGS[1] to r6(ARCH value)
+
 	@mov r0, r7
 	@bl owl_debug
 
 	ldr r0, =(CONFIG_SYS_TEXT_BASE)
 	mov r1, r7 @ real _start addr !
+	mov r2, r6 @ARCH value
 	@bl owl_debug
 	bl relocate_code
 
@@ -20,7 +23,7 @@ _payload_data_end_ofs:
 	.word _payload_data_end - startup
 
 /*
- * void relocate_code (addr_sp, addr_moni)
+ * void relocate_code (dst, REAL _start addr, ARCH)
  *
  * This "function" does not return, instead it continues in RAM
  * after relocating the monitor code.
@@ -31,6 +34,7 @@ _payload_data_end_ofs:
 relocate_code:
 	mov	r6, r0	/* save addr of destination */
 	mov	r5, r1	/* REAL _start addr */
+	mov	r4, r2	/* ARCH */
 
 	/* Set up the stack						    */
 stack_setup:
@@ -59,22 +63,19 @@ copy_loop:
  */
 jump_2_ram:
 /*
- * If I-cache is enabled invalidate it
+ * If I-cache is enabled invalidate it.
+ * In our case(RouterBOOT) it should be turned off
+ * anyway, but let it be.
  */
 #ifndef CONFIG_SYS_ICACHE_OFF
+	mov r0, #0
 	mcr	p15, 0, r0, c7, c5, 0	@ invalidate icache
 	mcr     p15, 0, r0, c7, c10, 4	@ DSB
 	mcr     p15, 0, r0, c7, c5, 4	@ ISB
 #endif
-/*
- * Move vector table
- * Set vector address in CP15 VBAR register 
- */
-	ldr     r0, =(CONFIG_SYS_TEXT_BASE)
-	mcr     p15, 0, r0, c12, c0, 0  @Set VBAR
-
 	ldr	r0, =(CONFIG_SYS_TEXT_BASE)
 	mov r1, r5 /* REAL _start addr */
+	mov r2, r4 /* ARCH */
 	/* jump to it ... */
 	mov	pc, r0
 

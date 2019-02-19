@@ -15,9 +15,25 @@
 
 #include <types.h>
 
+/* size: 4 * 4096. Start: TEXT_BASE + 40M. Try to limit to 128M.
+	 !!! This region of memory should not be inside the caching area !!!
+*/
+static u32 *page_table = (void*)(CONFIG_SYS_TEXT_BASE + 0x2800000);
+
+/* start and size of memory for D-Cache */
+static u32 bi_dram_0_start = 0;
+static u32 bi_dram_0_size = 0;
+
 #define CR_C	(1 << 2)	/* Dcache enable			*/
 #define CR_I	(1 << 12)	/* Icache enable			*/
 #define CR_M	(1 << 0)	/* MMU enable				*/
+
+#define CONFIG_NR_DRAM_BANKS		1
+#if defined(CONFIG_SYS_ARM_CACHE_WRITETHROUGH)
+#define CACHE_SETUP	0x1a
+#else
+#define CACHE_SETUP	0x1e
+#endif
 
 #define isb() __asm__ __volatile__ ("" : : : "memory")
 #define nop() __asm__ __volatile__("mov\tr0,r0\t@ nop\n\t");
@@ -282,20 +298,81 @@ void clear_l2cache_err(void)
 #endif
 }
 
+void __arm_init_before_mmu(void)
+{
+}
+void arm_init_before_mmu(void)
+	__attribute__((weak, alias("__arm_init_before_mmu")));
+
+void bi_dram_0_set_ranges(u32 start, u32 size){
+	bi_dram_0_start = start;
+	bi_dram_0_size = size;
+}
+
+static inline void dram_bank_mmu_setup(int bank)
+{
+	u32	i;
+	u32 skip = (u32)page_table >> 20;
+	for (i = bi_dram_0_start >> 20;
+	     i < (bi_dram_0_start + bi_dram_0_size) >> 20;
+	     i++) {
+	  if(i == skip){ /* foolproof */
+	  	continue;
+	  }
+		page_table[i] = i << 20 | (3 << 10) | CACHE_SETUP;
+	}
+}
+
+/* to activate the MMU we need to set up virtual memory: use 1M areas */
+static inline void mmu_setup(void)
+{
+	int i;
+	u32 reg;
+
+	arm_init_before_mmu();
+	/* Set up an identity-mapping for all 4GB, rw for everyone */
+	for (i = 0; i < 4096; i++)
+		page_table[i] = i << 20 | (3 << 10) | 0x12;
+
+	for (i = 0; i < CONFIG_NR_DRAM_BANKS; i++) {
+		dram_bank_mmu_setup(i);
+	}
+
+	/* Copy the page table address to cp15 */
+	asm volatile("mcr p15, 0, %0, c2, c0, 0"
+		     : : "r" (page_table) : "memory");
+	/* Set the access control to all-supervisor */
+	asm volatile("mcr p15, 0, %0, c3, c0, 0"
+		     : : "r" (~0));
+	/* and enable the mmu */
+	reg = get_cr();	/* get control reg. */
+	cp_delay();
+	set_cr(reg | CR_M);
+}
+
+static int mmu_enabled(void)
+{
+	return get_cr() & CR_M;
+}
+
 /* cache_bit must be either CR_I or CR_C */
 static void cache_enable(uint32_t cache_bit)
 {
 	uint32_t reg;
 
+	/* The data cache is not active unless the mmu is enabled too */
+	if ((cache_bit == CR_C) && !mmu_enabled())
+		mmu_setup();
 	reg = get_cr();	/* get control reg. */
 	cp_delay();
 	set_cr(reg | cache_bit);
 }
+
+
 void enable_caches(void)
 {
-#if defined CONFIG_IPQ4XXX
 	cache_enable(CR_I);
-#endif
+	cache_enable(CR_C);
 }
 
 void invalidate_dcache_all(void)
@@ -411,7 +488,6 @@ int cleanup_before_linux(void)
 	 * problems for kernel
 	 */
 	invalidate_dcache_all();
-
 
 	clear_l2cache_err();
 

@@ -7,7 +7,8 @@
 #TEXT_BASE=0x89000000
 #TEXT_BASE=0x80000000
 #TEXT_BASE=0x80000000
-TEXT_BASE=0x87300000 #realloc memory address
+#TEXT_BASE=0x87300000 #realloc memory address
+TEXT_BASE=0x84800000 #+72M. realloc memory address
 #TEXT_BASE=0x80BB0000
 #TEXT_BASE=0x80BB1E00
 #TEXT_BASE=0x80A00000
@@ -24,23 +25,18 @@ TEXT_BASE=0x87300000 #realloc memory address
 #TEXT_BASE=0xc0000000
 #TEXT_BASE=0xc1200000
 
-TEXT_BASE2=0x00000000 #for fat kernels <= 12M
+#TEXT_BASE2=0x00000000 #for fat kernels <= 12M
 #TEXT_BASE2=0x80000000 #for fat kernels <= 12M
 #TEXT_BASE2=0x81820000
-#TEXT_BASE2=0x01100000 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
+TEXT_BASE2=0x01100000 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
 
 OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
 export STAGING_DIR=${OPENWRT_DIR}/staging_dir
 export TOOLPATH=${STAGING_DIR}/toolchain-arm_cortex-a7+neon-vfpv4_gcc-7.4.0_musl_eabi
 export PATH=${TOOLPATH}/bin:${PATH}
 
-#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-8dev_jalapeno-initramfs-uImage
-#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-glinet_gl-b1300-initramfs-uImage
-#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-compex_wpj428-initramfs-uImage
-#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-uImage
+#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/old/openwrt-ipq40xx-meraki_mr33-initramfs-uImage
 KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-fit-uImage.itb
-#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-engenius_eap1300-initramfs-uImage
-#KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-zyxel_wre6606-initramfs-uImage
 
 CC="arm-openwrt-linux-gcc"
 LD="arm-openwrt-linux-ld"

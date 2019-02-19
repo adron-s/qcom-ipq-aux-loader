@@ -25,18 +25,11 @@ static unsigned long lzma_datasize;
 static unsigned long lzma_outsize;
 static unsigned long kernel_la;
 
-/*static unsigned char kaka[] = {
-	0x5D, 0x00, 0x00, 0x80, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0x00, 0x34, 0x19, 0x49, 0xEE, 0x8E, 0x68, 0x21, 0xFF, 0xFF, 0xFF, 0xB9, 0xE0, 0x00, 0x00}; */
-
 static void lzma_init_data(void *_kernel_la, void *_lzma_data, u32 _lzma_datasize)
 {
 	kernel_la = (unsigned long)_kernel_la;
-	/* lzma_data = kaka;
-	lzma_datasize = sizeof(kaka); */
 	lzma_data = _lzma_data;
 	lzma_datasize = _lzma_datasize;
-	printf("BASE lzma_data = %p\n", lzma_data);
 }
 
 static __inline__ unsigned char lzma_get_byte(void)
@@ -81,18 +74,10 @@ static int lzma_decompress(unsigned char *outStream)
 	SizeT ip, op;
 	int ret;
 
-	//lzma_state.Probs = (CProb *)0x81820000;
 	lzma_state.Probs = (CProb *) workspace;
 
-	printf("DO LzmaDecode. outStream = 0x%x, workspace = 0x%x\n", outStream, workspace);
-	printf("lzma_data = 0x%x, lzma_datasize = %d\n", lzma_data, lzma_datasize);
 	ret = LzmaDecode(&lzma_state, lzma_data, lzma_datasize, &ip, outStream,
 			 lzma_outsize, &op);
-	printf("PO LzmaDecode\n");
-
-	/* ret = LZMA_RESULT_OK + 1;
-	ip = 0;
-	op = 0; */
 
 	if (ret != LZMA_RESULT_OK) {
 		int i;
@@ -105,7 +90,6 @@ static int lzma_decompress(unsigned char *outStream)
 
 		printf("\n");
 	}
-	//for(;;); //!!!
 	return ret;
 }
 
@@ -129,7 +113,7 @@ int lzma_gogogo(void *_kernel_la, void *_lzma_data, u32 _lzma_datasize, u32 *lzm
 		}
 		return -2;
 	} else {
-		printf("done!\n");
+		printf("Done\n");
 	}
 	return 0;
 }
