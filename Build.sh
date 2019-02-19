@@ -25,10 +25,10 @@ TEXT_BASE=0x84800000 #+72M. realloc memory address
 #TEXT_BASE=0xc0000000
 #TEXT_BASE=0xc1200000
 
-#TEXT_BASE2=0x00000000 #for fat kernels <= 12M
+TEXT_BASE2=0x00000000 #for fat kernels <= 12M
 #TEXT_BASE2=0x80000000 #for fat kernels <= 12M
 #TEXT_BASE2=0x81820000
-TEXT_BASE2=0x01100000 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
+#TEXT_BASE2=0x01100000 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
 
 OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
 export STAGING_DIR=${OPENWRT_DIR}/staging_dir

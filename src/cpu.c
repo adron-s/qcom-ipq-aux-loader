@@ -491,5 +491,11 @@ int cleanup_before_linux(void)
 
 	clear_l2cache_err();
 
+	/* Yes. I am a paranoid */
+	/* Full system DSB - make sure that the invalidation is complete */
+	CP15DSB;
+	/* ISB - make sure the instruction stream sees it */
+	CP15ISB;
+
 	return 0;
 }

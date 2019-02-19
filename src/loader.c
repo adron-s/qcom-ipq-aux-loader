@@ -153,10 +153,10 @@ int handle_fit_header(void *_kernel_data_start, u32 kern_image_len){
 	}
 	printf("\n");
 	printf("Extracting LZMA kernel...");
-	watchdog_setup(60);
+	watchdog_setup(30);
 	/* without this all cpu operations is very very slow ! */
 	if(dst < src){
-		/* setup D-Cache ranges */
+		/* setup D-Cache ranges. our loader head + 32M */
 		bi_dram_0_set_ranges((u32)dst, (u32)(src - dst + (void*)0x2000000));
 		enable_caches(); /* Enable I and D caches ONLY for LZMA op */
 		lzma_gogogo(dst, src, kernel_body_len, &kernel_uncompr_size);
