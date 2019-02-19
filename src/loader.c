@@ -67,6 +67,9 @@ int handle_legacy_header(void *_kernel_data_start, u32 kern_image_len){
 	char *kernel_name = (char*)image->ih_name;
 	void *src = (void*)_kernel_data_start + sizeof(legacy_image_header_t);
 	void *dst = kernel_load;
+	/* compiler optimization barrier needed for GCC >= 3.4 */
+	__asm__ __volatile__("": : :"memory");
+
 	u32 kernel_body_len = ntohl(image->ih_size);
 
 	printf("  size = %u\n", kernel_body_len);
