@@ -1,6 +1,7 @@
 OUTPUT_ARCH(arm)
 SECTIONS {
 	.text : {
+		_start = .;
 		*(.text)
 		*(.text.*)
 		*(.data)

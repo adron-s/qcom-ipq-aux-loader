@@ -59,3 +59,9 @@ int raise(int signum)
 	printf("raise: Signal # %d caught\n", signum);
 	return 0;
 }
+
+/* Replacement (=dummy) for GNU/Linux division-by zero handler */
+void __div0 (void)
+{
+	hang();
+}

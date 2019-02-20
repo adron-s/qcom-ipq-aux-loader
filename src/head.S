@@ -1,5 +1,5 @@
-.globl startup
-startup:
+.globl _start
+_start:
 	mov r7, pc @save REAL _start addr
 	sub	r7, r7, #8
 
@@ -16,11 +16,11 @@ startup:
 
 .globl _payload_data_begin_ofs
 _payload_data_begin_ofs:
-	.word _payload_data_begin - startup
+	.word _payload_data_begin - _start
 
 .globl _payload_data_end_ofs
 _payload_data_end_ofs:
-	.word _payload_data_end - startup
+	.word _payload_data_end - _start
 
 /*
  * void relocate_code (dst, REAL _start addr, ARCH)
