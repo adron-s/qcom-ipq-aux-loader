@@ -12,11 +12,12 @@
 TEXT_BASE	:= 0x84800000
 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
 TEXT_BASE2 := 0x01100000
+#TEXT_BASE2 := 0x00000000
 #for fat kernels <= 12M
 TEXT_BASE2_FAT := 0x00000000
 
-CC			:= $(CROSS_COMPILE)gcc
-LD			:= $(CROSS_COMPILE)ld
+CC      := $(CROSS_COMPILE)gcc
+LD      := $(CROSS_COMPILE)ld
 OBJCOPY	:= $(CROSS_COMPILE)objcopy
 OBJDUMP	:= $(CROSS_COMPILE)objdump
 
@@ -32,9 +33,9 @@ CFLAGS = -D__KERNEL__ -DCONFIG_SYS_TEXT_BASE=$(TEXT_BASE) -DCONFIG_IPQ4XXX \
 
 CFLAGS += -I./src/include
 
-ASFLAGS		= $(CFLAGS) -D__ASSEMBLY__
+ASFLAGS	= $(CFLAGS) -D__ASSEMBLY__
 
-LDFLAGS		= -pie -Bstatic
+LDFLAGS	=
 LDFLAGS_DATA = -r -b binary --oformat $(O_FORMAT) -o
 
 O_FORMAT = $(shell $(OBJDUMP) -i | head -2 | grep elf32)
