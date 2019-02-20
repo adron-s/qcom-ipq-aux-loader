@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd ../
-./Debug.sh
+./Debug.sh $@
