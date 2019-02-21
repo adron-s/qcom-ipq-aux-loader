@@ -36,10 +36,13 @@ make $@
 #OBJDUMP="arm-openwrt-linux-objdump"
 #OBJCOPY="arm-openwrt-linux-objcopy"
 
-#${OBJCOPY} --only-section=.bss -S bin/loader bin/loader.slim
-#${OBJCOPY} -R .text -R .data -R .ARM.attributes -R .comment -R .debug.* -S bin/loader bin/loader.slim
-#${OBJDUMP} -x bin/loader.slim > bin/loader.slim.headers
-#${OBJDUMP} -x bin/loader > bin/loader.headers
+#-R .reginfo -R .note -R .comment -R .mdebug -R .MIPS.abiflags -S
+#${OBJCOPY} -j .rodata* -S bin/loader ./loader.slim
+#${OBJCOPY} -j .ARM.attributes -S bin/loader ./loader.slim
+#${OBJCOPY} -j .got* -S bin/loader ./loader.slim
+#${OBJCOPY} -R .got* -R .ARM.attributes -R .comment -R .debug.* -S bin/loader ./loader.slim
+#${OBJDUMP} -x ./loader.slim > ./loader.slim.headers
+#${OBJDUMP} -x bin/loader > ./loader.headers
 #${OBJDUMP} -D objs/start.o > ./start.asm
 #${OBJDUMP} -b binary -m arm -D bin/loader.bin > ./loader.bin.asm
 

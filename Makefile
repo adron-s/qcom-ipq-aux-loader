@@ -17,14 +17,12 @@ FAT_SIZE_START := 5000000
 #for fat kernels <= 12M
 TEXT_BASE2_FAT := 0x00000000
 
-KERNEL_IMAGE_FS = $(shell stat -L -c %s $(KERNEL_IMAGE))
-
 CC      := $(CROSS_COMPILE)gcc
 LD      := $(CROSS_COMPILE)ld
 OBJCOPY	:= $(CROSS_COMPILE)objcopy
 OBJDUMP	:= $(CROSS_COMPILE)objdump
 
-BIN_FLAGS	:= -O binary -R .reginfo -R .note -R .comment -R .mdebug -R .MIPS.abiflags -S
+BIN_FLAGS	:= -O binary -R .ARM.attributes -R .comment -R .debug.* -S
 
 CFLAGS = -D__KERNEL__ -DCONFIG_SYS_TEXT_BASE=$(TEXT_BASE) -DCONFIG_IPQ4XXX \
 			-DCONFIG_ARM -D__ARM__ -fPIC -Wall -Wstrict-prototypes 							 \
@@ -57,6 +55,12 @@ tgs-h 	:= $(tgs-h:%=src/include/%)
 tgs-lds := $(tgs-lds:%=src/%)
 tgs-o 	:= $(tgs-o:%=objs/%)
 tgs2-o 	:= $(tgs2-o:%=objs/%)
+
+ifeq ($(KERNEL_IMAGE),)
+  KERNEL_IMAGE_FS = 0
+else
+  KERNEL_IMAGE_FS = $(shell stat -L -c %s $(KERNEL_IMAGE))
+endif
 
 #Switching to use kernel size for fat images.
 ifeq ($(shell test ${KERNEL_IMAGE_FS} -gt ${FAT_SIZE_START}; echo $$?),0)
