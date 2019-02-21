@@ -17,6 +17,20 @@ FAT_SIZE_START := 5000000
 #for fat kernels <= 12M
 TEXT_BASE2_FAT := 0x00000000
 
+#the ability to reassigning base variables via ENV vars
+ifneq ($(AUX_LOADER_TEXT_BASE),)
+  TEXT_BASE = $(AUX_LOADER_TEXT_BASE)
+endif
+ifneq ($(AUX_LOADER_TEXT_BASE2),)
+  TEXT_BASE2 = $(AUX_LOADER_TEXT_BASE2)
+endif
+ifneq ($(AUX_LOADER_FAT_SIZE_START),)
+  FAT_SIZE_START = $(AUX_LOADER_FAT_SIZE_START)
+endif
+ifneq ($(AUX_LOADER_TEXT_BASE2_FAT),)
+  TEXT_BASE2_FAT = $(AUX_LOADER_TEXT_BASE2_FAT)
+endif
+
 CC      := $(CROSS_COMPILE)gcc
 LD      := $(CROSS_COMPILE)ld
 OBJCOPY	:= $(CROSS_COMPILE)objcopy
