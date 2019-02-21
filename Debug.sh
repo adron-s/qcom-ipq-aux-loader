@@ -1,6 +1,8 @@
 #!/bin/sh
 
 OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
+#Uncomment this to see debug messages
+export AUX_LOADER_DEBUG=true
 
 TFTPBOOT="/var/lib/tftpboot"
 FAKEFNAME="linux_t1.bin"

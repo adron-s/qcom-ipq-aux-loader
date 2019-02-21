@@ -32,6 +32,11 @@ CFLAGS = -D__KERNEL__ -DCONFIG_SYS_TEXT_BASE=$(TEXT_BASE) -DCONFIG_IPQ4XXX \
 			-mno-unaligned-access -fno-builtin -ffreestanding 				           \
 			-g -Os -fno-common -ffixed-r8
 
+#debug messages
+ifneq ($(AUX_LOADER_DEBUG),)
+  CFLAGS += -DAUX_LOADER_DEBUG
+endif
+
 CFLAGS += -I./src/include
 
 ASFLAGS	= $(CFLAGS) -D__ASSEMBLY__

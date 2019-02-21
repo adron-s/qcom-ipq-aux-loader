@@ -72,10 +72,10 @@ int handle_legacy_header(void *_kernel_data_start, u32 kern_image_len){
 
 	u32 kernel_body_len = ntohl(image->ih_size);
 
-	printf("  size = %u\n", kernel_body_len);
-	printf("  name = '%s'\n", kernel_name);
-	printf("  load = 0x%08x\n", kernel_load);
-	printf("  ep = 0x%08x\n", kernel_ep);
+	debug("  size = %u\n", kernel_body_len);
+	debug("  name = '%s'\n", kernel_name);
+	debug("  load = 0x%08x\n", kernel_load);
+	debug("  ep = 0x%08x\n", kernel_ep);
 
 	//check ih_size for adequate value
 	if(kern_image_len - sizeof(legacy_image_header_t) < kernel_body_len){
@@ -85,7 +85,7 @@ int handle_legacy_header(void *_kernel_data_start, u32 kern_image_len){
 			sizeof(legacy_image_header_t), kernel_body_len);
 		return -99;
 	}
-	printf("\n");
+	debug("\n");
 	printf("Copy kernel...");
 	my_memcpy(dst, src, kernel_body_len);
 	printf("Done\n");
@@ -138,11 +138,11 @@ int handle_fit_header(void *_kernel_data_start, u32 kern_image_len){
 	if(!(dtb_data = fdt_get_prop(data, FIT_DTB_NODE_NAME, "data", &dtb_body_len)))
 		return -93;
 
-	printf("  size = %u\n", kernel_body_len);
-	printf("  name = '%s'\n", kernel_name);
-	printf("  load = 0x%08x\n", kernel_load);
-	printf("  ep = 0x%08x\n", kernel_ep);
-	printf("  compr = %s\n", kernel_compr);
+	debug("  size = %u\n", kernel_body_len);
+	debug("  name = '%s'\n", kernel_name);
+	debug("  load = 0x%08x\n", kernel_load);
+	debug("  ep = 0x%08x\n", kernel_ep);
+	debug("  compr = %s\n", kernel_compr);
 
 	//check kernel@1->data size for adequate value
 	if(kernel_body_len >= kern_image_len){
@@ -151,7 +151,7 @@ int handle_fit_header(void *_kernel_data_start, u32 kern_image_len){
 		printf("  details: %d >= %d !\n", kernel_body_len, kern_image_len);
 		return -99;
 	}
-	printf("\n");
+	debug("\n");
 	printf("Extracting LZMA kernel...");
 	watchdog_setup(30);
 	/* without this all cpu operations is very very slow ! */
@@ -185,12 +185,12 @@ void loader_main(u32 head_text_base, u32 _arch)
 	__asm__ __volatile__("": : :"memory");
 
 	printf("\n");
-	printf("OpenWrt kernel loader for Qualcom IPQ-4XXX/IPQ-806X\n");
-	printf("Copyright (C) 2019 Sergey Sergeev <adron@mstnt.com>\n");
+	printf("OpenWrt kernel loader for Qualcomm IPQ-4XXX/IPQ-806X\n");
+	printf("Copyright (C) 2019  Sergey Sergeev <adron@mstnt.com>\n");
 
-	printf("\n");
-	printf("  head loader TEXT_BASE = 0x%08X\n", head_text_base);
-	printf("kernel loader TEXT_BASE = 0x%08X\n", CONFIG_SYS_TEXT_BASE);
+	debug("\n");
+	debug("  head loader TEXT_BASE = 0x%08X\n", head_text_base);
+	debug("kernel loader TEXT_BASE = 0x%08X\n", CONFIG_SYS_TEXT_BASE);
 	//printf("kernel_data_start = 0x%08X\n", _kernel_data_start);
 	//printf("kernel_data_end = 0x%08X\n", _kernel_data_end);
 	printf("\n");
@@ -200,20 +200,20 @@ void loader_main(u32 head_text_base, u32 _arch)
 
 	arch = _arch;
 	kernel_p1 = arch;
-	printf("ARCH = %d\n", arch);
+	debug("ARCH = %d\n", arch);
 	if(arch != IPQ_ARCH){
 		printf("Critical alert ! ARCH mismatch: %u vs %u\n", arch, IPQ_ARCH);
 		watchdog_setup(5); for(;;);
 	}
 	magic = ntohl(*_magic);
-	printf("Kernel image header:\n");
+	debug("Kernel image header:\n");
 	switch(magic){
 		case LEGACY_IH_MAGIC:
-			printf("  magic = 0x%x, Legacy uImage\n", magic);
+			debug("  magic = 0x%x, Legacy uImage\n", magic);
 			ret = handle_legacy_header(_kernel_data_start, kern_image_len);
 			break;
 		case FIT_IH_MAGIC:
-			printf("  magic = 0x%x, FIT uImage\n", magic);
+			debug("  magic = 0x%x, FIT uImage\n", magic);
 			ret = handle_fit_header(_kernel_data_start, kern_image_len);
 			break;
 		default:

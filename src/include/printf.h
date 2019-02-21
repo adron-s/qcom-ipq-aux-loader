@@ -12,6 +12,12 @@
 #ifndef _printf_h_
 #define _printf_h_
 
+#ifdef AUX_LOADER_DEBUG
+#define debug(format, args...) printf(format, ##args)
+#else
+#define debug(...)
+#endif
+
 #include <stdarg.h>
 int printf(const char *fmt, ...);
 
