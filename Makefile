@@ -12,9 +12,12 @@
 TEXT_BASE	:= 0x84800000
 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
 TEXT_BASE2 := 0x01100000
-#TEXT_BASE2 := 0x00000000
+#fat kernels start size 5M
+FAT_SIZE_START := 5000000
 #for fat kernels <= 12M
 TEXT_BASE2_FAT := 0x00000000
+
+KERNEL_IMAGE_FS = $(shell stat -L -c %s $(KERNEL_IMAGE))
 
 CC      := $(CROSS_COMPILE)gcc
 LD      := $(CROSS_COMPILE)ld
@@ -55,6 +58,11 @@ tgs-lds := $(tgs-lds:%=src/%)
 tgs-o 	:= $(tgs-o:%=objs/%)
 tgs2-o 	:= $(tgs2-o:%=objs/%)
 
+#Switching to use kernel size for fat images.
+ifeq ($(shell test ${KERNEL_IMAGE_FS} -gt ${FAT_SIZE_START}; echo $$?),0)
+  TEXT_BASE2 = $(TEXT_BASE2_FAT)
+endif
+
 all: $(ldr-elf)
 
 # Don't build dependencies, this may die if $(CC) isn't gcc
@@ -70,6 +78,7 @@ $(tgs-o): $(tgs-h)
 
 # objs/qcom_uart.o objs/printf.o - add it to *.o list for debug
 $(ldr-elf): $(tgs2-o)
+	@echo "Kernel size = ${KERNEL_IMAGE_FS}"
 	$(LD) $(LDFLAGS) -e _start -Ttext $(TEXT_BASE2) -o $(ldr-elf) \
 	$(tgs2-o) -Map maps/loader2.map -T src/loader2.lds
 

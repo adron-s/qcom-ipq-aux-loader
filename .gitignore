@@ -9,3 +9,6 @@ loader.elf
 *.bin
 ubi/ubi-rootdir
 ubi/*.ubi*
+maps/*
+bin/*
+objs/*

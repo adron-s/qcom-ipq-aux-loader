@@ -18,7 +18,7 @@ export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-m
 #echo $KERNEL_IMAGE
 #test for fat images
 #cat $KERNEL_IMAGE > ./b1.bin
-#dd if=$KERNEL_IMAGE bs=1k count=2000 >> ./b1.bin
+#dd if=$KERNEL_IMAGE bs=1k count=3000 >> ./b1.bin
 #cat $KERNEL_IMAGE >> ./b1.bin
 #cat $KERNEL_IMAGE >> ./b1.bin
 #cat $KERNEL_IMAGE >> ./b1.bin
