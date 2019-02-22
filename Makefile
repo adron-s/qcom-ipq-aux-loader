@@ -38,13 +38,24 @@ OBJDUMP	:= $(CROSS_COMPILE)objdump
 
 BIN_FLAGS	:= -O binary -R .ARM.attributes -R .comment -R .debug.* -S
 
-CFLAGS = -D__KERNEL__ -DCONFIG_SYS_TEXT_BASE=$(TEXT_BASE) -DCONFIG_IPQ4XXX \
-			-DCONFIG_ARM -D__ARM__ -fPIC -Wall -Wstrict-prototypes 							 \
-			-Wno-format-security -Wno-format-nonliteral 												 \
-			-fno-stack-protector -fstack-usage -pipe 														 \
-			-marm -mno-thumb-interwork -mabi=aapcs-linux -march=armv7-a          \
-			-mno-unaligned-access -fno-builtin -ffreestanding 				           \
+CFLAGS = -D__KERNEL__ -DCONFIG_SYS_TEXT_BASE=$(TEXT_BASE) 	 			\
+			-DCONFIG_ARM -D__ARM__ -fPIC -Wall -Wstrict-prototypes 			\
+			-Wno-format-security -Wno-format-nonliteral 								\
+			-fno-stack-protector -fstack-usage -pipe 										\
+			-marm -mno-thumb-interwork -mabi=aapcs-linux -march=armv7-a \
+			-mno-unaligned-access -fno-builtin -ffreestanding 				  \
 			-g -Os -fno-common -ffixed-r8
+
+#CPU type
+ifeq ($(AUX_LOADER_CPU_TYPE),)
+  CFLAGS += -DCONFIG_IPQ4XXX
+endif
+ifeq ($(AUX_LOADER_CPU_TYPE),IPQ4XXX)
+  CFLAGS += -DCONFIG_IPQ4XXX
+endif
+ifeq ($(AUX_LOADER_CPU_TYPE),IPQ806X)
+  CFLAGS += -DCONFIG_IPQ806X
+endif
 
 #debug messages
 ifneq ($(AUX_LOADER_DEBUG),)

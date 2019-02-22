@@ -3,6 +3,9 @@
 OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
 #Uncomment this to see debug messages
 export AUX_LOADER_DEBUG=true
+#CPU type
+export AUX_LOADER_CPU_TYPE=IPQ4XXX
+#export AUX_LOADER_CPU_TYPE=IPQ806X
 
 TFTPBOOT="/var/lib/tftpboot"
 FAKEFNAME="linux_t1.bin"
@@ -14,7 +17,7 @@ export STAGING_DIR=${OPENWRT_DIR}/staging_dir
 export TOOLPATH=${STAGING_DIR}/toolchain-arm_cortex-a7+neon-vfpv4_gcc-7.4.0_musl_eabi
 export PATH=${TOOLPATH}/bin:${PATH}
 export CROSS_COMPILE=arm-openwrt-linux-
-export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-meraki_mr33-initramfs-fit-uImage.itb
+export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-mikrotik_rb450gx4-initramfs-fit-uImage.itb
 #export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/old/openwrt-ipq40xx-meraki_mr33-initramfs-uImage
 
 #echo $KERNEL_IMAGE
