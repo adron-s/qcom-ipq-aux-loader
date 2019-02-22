@@ -8,6 +8,7 @@
 #  by the Free Software Foundation.
 #
 
+CPU_TYPE := IPQ4XXX
 #+72M. realloc memory address
 TEXT_BASE	:= 0x84800000
 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
@@ -16,20 +17,6 @@ TEXT_BASE2 := 0x01100000
 FAT_SIZE_START := 5000000
 #for fat kernels <= 12M
 TEXT_BASE2_FAT := 0x00000000
-
-#the ability to reassigning base variables via ENV vars
-ifneq ($(AUX_LOADER_TEXT_BASE),)
-  TEXT_BASE = $(AUX_LOADER_TEXT_BASE)
-endif
-ifneq ($(AUX_LOADER_TEXT_BASE2),)
-  TEXT_BASE2 = $(AUX_LOADER_TEXT_BASE2)
-endif
-ifneq ($(AUX_LOADER_FAT_SIZE_START),)
-  FAT_SIZE_START = $(AUX_LOADER_FAT_SIZE_START)
-endif
-ifneq ($(AUX_LOADER_TEXT_BASE2_FAT),)
-  TEXT_BASE2_FAT = $(AUX_LOADER_TEXT_BASE2_FAT)
-endif
 
 CC      := $(CROSS_COMPILE)gcc
 LD      := $(CROSS_COMPILE)ld
@@ -46,20 +33,16 @@ CFLAGS = -D__KERNEL__ -DCONFIG_SYS_TEXT_BASE=$(TEXT_BASE) 	 			\
 			-mno-unaligned-access -fno-builtin -ffreestanding 				  \
 			-g -Os -fno-common -ffixed-r8
 
-#CPU type
-ifeq ($(AUX_LOADER_CPU_TYPE),)
+ifeq ($(CPU_TYPE),IPQ4XXX)
   CFLAGS += -DCONFIG_IPQ4XXX
 endif
-ifeq ($(AUX_LOADER_CPU_TYPE),IPQ4XXX)
-  CFLAGS += -DCONFIG_IPQ4XXX
-endif
-ifeq ($(AUX_LOADER_CPU_TYPE),IPQ806X)
+ifeq ($(CPU_TYPE),IPQ806X)
   CFLAGS += -DCONFIG_IPQ806X
 endif
 
 #debug messages
-ifneq ($(AUX_LOADER_DEBUG),)
-  CFLAGS += -DAUX_LOADER_DEBUG
+ifeq ($(DEBUG),true)
+  CFLAGS += -DDEBUG
 endif
 
 CFLAGS += -I./src/include
@@ -88,8 +71,11 @@ tgs2-o 	:= $(tgs2-o:%=objs/%)
 
 ifeq ($(KERNEL_IMAGE),)
   KERNEL_IMAGE_FS = 0
-else
+endif
+ifeq ($(shell test -f $(KERNEL_IMAGE); echo $$?),0)
   KERNEL_IMAGE_FS = $(shell stat -L -c %s $(KERNEL_IMAGE))
+else
+  KERNEL_IMAGE_FS = 0
 endif
 
 #Switching to use kernel size for fat images.

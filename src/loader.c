@@ -64,7 +64,6 @@ int handle_legacy_header(void *_kernel_data_start, u32 kern_image_len){
 	legacy_image_header_t *image = (void*)_kernel_data_start;
 	void *kernel_load = (void*)ntohl(image->ih_load);
 	void *kernel_ep = (void*)ntohl(image->ih_ep);
-	char *kernel_name = (char*)image->ih_name;
 	void *src = (void*)_kernel_data_start + sizeof(legacy_image_header_t);
 	void *dst = kernel_load;
 	/* compiler optimization barrier needed for GCC >= 3.4 */
@@ -73,7 +72,7 @@ int handle_legacy_header(void *_kernel_data_start, u32 kern_image_len){
 	u32 kernel_body_len = ntohl(image->ih_size);
 
 	debug("  size = %u\n", kernel_body_len);
-	debug("  name = '%s'\n", kernel_name);
+	debug("  name = '%s'\n", (char*)image->ih_name);
 	debug("  load = 0x%08x\n", kernel_load);
 	debug("  ep = 0x%08x\n", kernel_ep);
 

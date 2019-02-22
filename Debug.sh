@@ -2,10 +2,10 @@
 
 OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
 #Uncomment this to see debug messages
-export AUX_LOADER_DEBUG=true
+#DEBUG=true
 #CPU type
-export AUX_LOADER_CPU_TYPE=IPQ4XXX
-#export AUX_LOADER_CPU_TYPE=IPQ806X
+CPU_TYPE=IPQ4XXX
+#CPU_TYPE=IPQ806X
 
 TFTPBOOT="/var/lib/tftpboot"
 FAKEFNAME="linux_t1.bin"
@@ -29,7 +29,7 @@ export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-m
 #cat $KERNEL_IMAGE >> ./b1.bin
 #export KERNEL_IMAGE=./b1.bin
 
-make $@
+make DEBUG=${DEBUG} CPU_TYPE=${CPU_TYPE} $@
 
 [ -f ${RES_FILE} -a -d ${TFTPBOOT} ] && {
 	cat ${RES_FILE} > ${TFTPBOOT}/${FAKEFNAME}
