@@ -18,6 +18,10 @@ FAT_SIZE_START := 5000000
 #for fat kernels <= 12M
 TEXT_BASE2_FAT := 0x00000000
 
+#ubi image vars
+BLOCKSIZE := 256k
+PAGESIZE  := 4096
+
 CC      := $(CROSS_COMPILE)gcc
 LD      := $(CROSS_COMPILE)ld
 OBJCOPY	:= $(CROSS_COMPILE)objcopy
@@ -126,15 +130,15 @@ objs/data.o: $(KERNEL_IMAGE)
 	$(LD) $(LDFLAGS_DATA) $@ $< -T src/kernel-data.lds
 
 $(ldr-ubi): $(ldr-ubifs)
-	$(STAGING_DIR_HOST)/bin/ubinize -p 262144 -m 4096 -O 4096 -s 4096 \
-		-x 1 -Q 3521347800 -o $@ ubi/loader.ubi.ini
+	$(STAGING_DIR_HOST)/bin/ubinize -p $(BLOCKSIZE:%k=%KiB) \
+		-m $(PAGESIZE) -o $@ ubi/loader.ubi.ini
 
 $(ldr-ubifs): $(ldr-elf)
 	rm -Rf ubi/ubifs-rootdir
 	mkdir ubi/ubifs-rootdir
 	cp bin/loader.elf ubi/ubifs-rootdir/kernel
 	$(STAGING_DIR_HOST)/bin/mkfs.ubifs \
-		-m 4096 -e 253952 -c 60 -x none -f 8 -k r5 -p 1 -l 3 \
+		-m $(PAGESIZE) -e 253952 -c 60 --compr=none \
 		-r ubi/ubifs-rootdir $(ldr-ubifs)
 	rm -Rf ubi/ubifs-rootdir
 
