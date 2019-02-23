@@ -7,8 +7,7 @@
 loader
 loader.elf
 *.bin
-ubi/ubi-rootdir
-ubi/*.ubi*
+ubi/ubifs-rootdir
 maps/*
 bin/*
 objs/*
