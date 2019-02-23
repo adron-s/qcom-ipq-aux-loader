@@ -49,6 +49,7 @@ loader-compile: $(PKG_BUILD_DIR)/.prepared
 		FAT_SIZE_START=$(FAT_SIZE_START)													\
 		TEXT_BASE2_FAT=$(TEXT_BASE2_FAT) 													\
 		CPU_TYPE=$(CPU_TYPE) KERNEL_IMAGE=$(LOADER_DATA)					\
+		BLOCKSIZE=$(BLOCKSIZE) PAGESIZE=$(PAGESIZE) 							\
 		clean $(LOADER_TYPE)
 
 loader.elf: $(PKG_BUILD_DIR)/bin/loader.elf
