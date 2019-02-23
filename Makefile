@@ -89,6 +89,9 @@ ifeq ($(shell test ${KERNEL_IMAGE_FS} -gt ${FAT_SIZE_START}; echo $$?),0)
   TEXT_BASE2 = $(TEXT_BASE2_FAT)
 endif
 
+#Create the necessary directories
+$(shell mkdir -p objs maps bin)
+
 elf: $(ldr-elf)
 ubi: $(ldr-ubi)
 all: $(ldr-ubi)
