@@ -57,6 +57,8 @@ O_FORMAT = $(shell $(OBJDUMP) -i | head -2 | grep elf32)
 ldr 		:= bin/loader
 ldr-bin := bin/loader.bin
 ldr-elf := bin/loader.elf
+ldr-ubifs := bin/loader.ubifs
+ldr-ubi := bin/loader.ubi
 
 tgs-h 	:= io.h iomap.h LzmaDecode.h LzmaTypes.h printf.h types.h \
            uimage/fdt.h uimage/legacy.h
@@ -83,7 +85,9 @@ ifeq ($(shell test ${KERNEL_IMAGE_FS} -gt ${FAT_SIZE_START}; echo $$?),0)
   TEXT_BASE2 = $(TEXT_BASE2_FAT)
 endif
 
-all: $(ldr-elf)
+elf: $(ldr-elf)
+ubi: $(ldr-ubi)
+all: $(ldr-ubi)
 
 # Don't build dependencies, this may die if $(CC) isn't gcc
 dep:
@@ -121,7 +125,20 @@ objs/data2.o: $(ldr-bin)
 objs/data.o: $(KERNEL_IMAGE)
 	$(LD) $(LDFLAGS_DATA) $@ $< -T src/kernel-data.lds
 
+$(ldr-ubi): $(ldr-ubifs)
+	$(STAGING_DIR_HOST)/bin/ubinize -p 262144 -m 4096 -O 4096 -s 4096 \
+		-x 1 -Q 3521347800 -o $@ ubi/loader.ubi.ini
+
+$(ldr-ubifs): $(ldr-elf)
+	rm -Rf ubi/ubifs-rootdir
+	mkdir ubi/ubifs-rootdir
+	cp bin/loader.elf ubi/ubifs-rootdir/kernel
+	$(STAGING_DIR_HOST)/bin/mkfs.ubifs \
+		-m 4096 -e 253952 -c 60 -x none -f 8 -k r5 -p 1 -l 3 \
+		-r ubi/ubifs-rootdir $(ldr-ubifs)
+	rm -Rf ubi/ubifs-rootdir
+
 mrproper: clean
 
 clean:
-	rm -f bin/* objs/* maps/*
+	rm -Rf bin/* objs/* maps/* ubi/ubifs-rootdir/

@@ -21,6 +21,7 @@ TARGET_DIR	:= $(KDIR)
 endif
 
 LOADER_ELF	:= $(TARGET_DIR)/$(LOADER_NAME).elf
+LOADER_UBI	:= $(TARGET_DIR)/$(LOADER_NAME).ubi
 
 PKG_NAME := ipq-aux-loader
 PKG_BUILD_DIR := $(KDIR)/$(PKG_NAME)
@@ -48,10 +49,13 @@ loader-compile: $(PKG_BUILD_DIR)/.prepared
 		FAT_SIZE_START=$(FAT_SIZE_START)													\
 		TEXT_BASE2_FAT=$(TEXT_BASE2_FAT) 													\
 		CPU_TYPE=$(CPU_TYPE) KERNEL_IMAGE=$(LOADER_DATA)					\
-		clean all
+		clean $(LOADER_TYPE)
 
 loader.elf: $(PKG_BUILD_DIR)/bin/loader.elf
 	$(CP) $< $(LOADER_ELF)
+
+loader.ubi: $(PKG_BUILD_DIR)/bin/loader.ubi
+	$(CP) $< $(LOADER_UBI)
 
 download:
 prepare: $(PKG_BUILD_DIR)/.prepared

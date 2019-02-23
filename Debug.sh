@@ -14,6 +14,7 @@ rm -f ${RES_FILE}
 rm -f ./objs/data*.o
 
 export STAGING_DIR=${OPENWRT_DIR}/staging_dir
+export STAGING_DIR_HOST=${STAGING_DIR}/host
 export TOOLPATH=${STAGING_DIR}/toolchain-arm_cortex-a7+neon-vfpv4_gcc-7.4.0_musl_eabi
 export PATH=${TOOLPATH}/bin:${PATH}
 export CROSS_COMPILE=arm-openwrt-linux-
