@@ -255,6 +255,68 @@ PrintString(char * buf, char* s, int length, int ladjust)
     return length;
 }
 
+#define wr2p(tmp){					 \
+	iters_count++;						 \
+	if((tmp) <= 9){						 \
+		*p++ = '0' + (tmp);			 \
+	}else if(upcase) {				 \
+		*p++ = 'A' + (tmp) - 10; \
+	}else{										 \
+		*p++ = 'a' + (tmp) - 10; \
+	}													 \
+}
+
+/* 32 bit DEC unsigned int convert to string */
+/* https://stackoverflow.com/questions/33203044/number-to-digits-without-using-strings-nor-division-by-10 */
+static int my_dec2str(char *p, unsigned int A, int upcase){
+	unsigned R, N;
+	unsigned long long Q; /* 32 bit Q can be owerflow, so use 64 bit */
+	int iters_count = 0;
+	if(A < 10){
+		wr2p(A);
+		return iters_count;
+	}
+	if(A == 10){
+		wr2p(0);
+		wr2p(1);
+		return iters_count;
+	}
+	while(A > 0){
+		Q = (((unsigned long long)A >> 1LLU) + (unsigned long long)A) >> 1LLU;
+		Q = ((Q >>  4LLU) + Q);
+		Q = ((Q >>  8LLU) + Q);
+		Q = ((Q >> 16LLU) + Q) >> 3LLU;
+		/* either Q = A / 10 or Q + 1 = A / 10 for all 32-bit unsigned A */
+		R = A - 10 * Q;
+		N = Q;
+		if(R > 9){
+			R = A - 10 * (Q + 1);
+			N = Q + 1;
+		}
+		A = N;
+		//printf("R = %u, Q = %u\n", R, Q);
+		wr2p(R);
+	}
+	return iters_count;
+}
+
+/* 32 bit HEX unsigned int convert to string */
+/* https://stackoverflow.com/questions/33203044/number-to-digits-without-using-strings-nor-division-by-10 */
+static int my_hex2str(char *p, unsigned int  A, int upcase){
+	int iters_count = 0;
+	if(A < 16){
+		wr2p(A);
+		return iters_count;
+	}
+	while(A > 0){
+		wr2p(A & 0xF);
+		//printf("%d\n", A & 0xF);
+		A >>= 4;
+	}
+	return iters_count;
+}
+
+
 static int
 PrintNum(char * buf, unsigned int u, int base, int negFlag,
 	 int length, int ladjust, char padc, int upcase)
@@ -273,17 +335,10 @@ PrintNum(char * buf, unsigned int u, int base, int negFlag,
     char *p = buf;
     int i;
 
-    do {
-	int tmp = u % base;
-	if (tmp <= 9) {
-	    *p++ = '0' + tmp;
-	} else if (upcase) {
-	    *p++ = 'A' + tmp - 10;
-	} else {
-	    *p++ = 'a' + tmp - 10;
-	}
-	u /= base;
-    } while (u != 0);
+		if(base == 10)
+			p += my_dec2str(p, u, upcase);
+		if(base == 16)
+			p += my_hex2str(p, u, upcase);
 
     if (negFlag) {
 	*p++ = '-';

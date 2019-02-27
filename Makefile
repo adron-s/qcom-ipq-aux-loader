@@ -79,7 +79,7 @@ tgs-h 	:= io.h iomap.h LzmaDecode.h LzmaTypes.h printf.h types.h \
            uimage/fdt.h uimage/legacy.h
 tgs-lds	:= kernel-data.lds loader2.lds loader.lds
 tgs-o 	:= start.o board.o cpu.o fdt.o loader.o lzma.o LzmaDecode.o \
-           printf.o qcom_uart.o watchdog.o divmod.o data.o
+           printf.o qcom_uart.o watchdog.o data.o
 tgs2-o	:= head.o data2.o watchdog.o
 tgs-h 	:= $(tgs-h:%=src/include/%)
 tgs-lds := $(tgs-lds:%=src/%)
