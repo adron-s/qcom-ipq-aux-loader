@@ -2,6 +2,8 @@
  * Copyright (C) 2001 MontaVista Software Inc.
  * Author: Jun Sun, jsun@mvista.com or jsun@junsun.net
  *
+ * Copyright (C) 2019 Sergey Sergeev <adron@mstnt.com>
+ *
  * This program is free software; you can redistribute  it and/or modify it
  * under  the terms of  the GNU General  Public License as published by the
  * Free Software Foundation;  either version 2 of the  License, or (at your
@@ -301,7 +303,6 @@ static int my_dec2str(char *p, unsigned int A, int upcase){
 }
 
 /* 32 bit HEX unsigned int convert to string */
-/* https://stackoverflow.com/questions/33203044/number-to-digits-without-using-strings-nor-division-by-10 */
 static int my_hex2str(char *p, unsigned int  A, int upcase){
 	int iters_count = 0;
 	if(A < 16){
