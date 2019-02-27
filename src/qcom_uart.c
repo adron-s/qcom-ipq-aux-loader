@@ -85,6 +85,12 @@
 #define MSM_BOOT_UART_DM_RXBREAK_END         (1 << 11)
 #define MSM_BOOT_UART_DM_PAR_FRAME_ERR_IRQ   (1 << 12)
 
+#define NONE 0x0
+
+#if UARTx_DM_BASE == NONE
+void serial_putc(char c){ } /* quiet mode */
+#else
+
 void serial_putc(char c){
 	unsigned int base = UARTx_DM_BASE;
 	unsigned int num_of_chars = 1;
@@ -120,6 +126,8 @@ void serial_putc(char c){
 	/* TX FIFO has space. Write the chars */
 	writel(tx_word, MSM_BOOT_UART_DM_TF(base, 0));
 }
+
+#endif /* UARTx_DM_BASE == NONE */
 
 /*
 //for HEAD loader debug

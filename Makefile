@@ -46,9 +46,13 @@ endif
 
 #Com port number(for printf)
 ifeq ($(UART),)
+  CFLAGS += -DUARTx_DM_BASE=UART1_DM_BASE
+else
+ifeq ($(UART),NONE)
   CFLAGS += -DUARTx_DM_BASE=NONE
 else
   CFLAGS += -DUARTx_DM_BASE=UART$(UART)_DM_BASE
+endif
 endif
 
 #debug messages
