@@ -40,13 +40,6 @@ void dump_mem(unsigned char *p, char *str){
 	);
 }
 
-void reset_cpu(ulong addr)
-{
-	/* clear ps-hold bit to reset the soc */
-	writel(0, GCNT_PSHOLD);
-	while (1);
-}
-
 void hang(void)
 {
 	printf("### ERROR ### Please RESET the board ###\n");

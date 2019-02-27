@@ -1,11 +1,23 @@
 #!/bin/sh
 
-OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
+#IPQ 4 or 8
+IPQ_NUMBER=8
+
 #Uncomment this to see debug messages
-#DEBUG=true
-#CPU type
-CPU_TYPE=IPQ4XXX
-#CPU_TYPE=IPQ806X
+DEBUG=true
+
+[ ${IPQ_NUMBER} -eq 4 ] && {
+	OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
+	#CPU IPQ-4019(RB450Gx4)
+	CPU_TYPE=IPQ4XXX
+	UART=1
+}
+[ ${IPQ_NUMBER} -eq 8 ] && {
+	OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq806x
+	#CPU IPQ-8064(RB3011)
+	CPU_TYPE=IPQ806X
+	UART=7
+}
 
 TFTPBOOT="/var/lib/tftpboot"
 FAKEFNAME="linux_t1.bin"
@@ -15,11 +27,18 @@ rm -f ./objs/data*.o
 
 export STAGING_DIR=${OPENWRT_DIR}/staging_dir
 export STAGING_DIR_HOST=${STAGING_DIR}/host
-export TOOLPATH=${STAGING_DIR}/toolchain-arm_cortex-a7+neon-vfpv4_gcc-7.4.0_musl_eabi
+[ ${IPQ_NUMBER} -eq 4 ] && {
+	export TOOLPATH=${STAGING_DIR}/toolchain-arm_cortex-a7+neon-vfpv4_gcc-7.4.0_musl_eabi
+	export KERNEL_IMAGE=${OPENWRT_DIR}/build_dir/target-arm_cortex-a7+neon-vfpv4_musl_eabi/linux-ipq40xx/mikrotik_rb450gx4-fit-uImage.itb
+	#export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-mikrotik_rb450gx4-initramfs-fit-uImage.itb
+	#export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/old/openwrt-ipq40xx-meraki_mr33-initramfs-uImage
+}
+[ ${IPQ_NUMBER} -eq 8 ] && {
+	export TOOLPATH=${STAGING_DIR}/toolchain-arm_cortex-a15+neon-vfpv4_gcc-7.4.0_musl_eabi
+	export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq806x/generic/openwrt-ipq806x-netgear_r7500v2-initramfs-fit-uImage.itb
+}
 export PATH=${TOOLPATH}/bin:${PATH}
 export CROSS_COMPILE=arm-openwrt-linux-
-export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-mikrotik_rb450gx4-initramfs-fit-uImage.itb
-#export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/old/openwrt-ipq40xx-meraki_mr33-initramfs-uImage
 
 #echo $KERNEL_IMAGE
 #test for fat images
@@ -30,7 +49,7 @@ export KERNEL_IMAGE=${OPENWRT_DIR}/bin/targets/ipq40xx/generic/openwrt-ipq40xx-m
 #cat $KERNEL_IMAGE >> ./b1.bin
 #export KERNEL_IMAGE=./b1.bin
 
-make DEBUG=${DEBUG} CPU_TYPE=${CPU_TYPE} $@
+make DEBUG=${DEBUG} CPU_TYPE=${CPU_TYPE} UART=${UART} $@
 
 [ -f ${RES_FILE} -a -d ${TFTPBOOT} ] && {
 	cat ${RES_FILE} > ${TFTPBOOT}/${FAKEFNAME}
