@@ -10,7 +10,7 @@
 
 CPU_TYPE := IPQ4XXX
 #+72M. realloc memory address
-TEXT_BASE	:= 0x44800000
+TEXT_BASE	:= 0x84800000
 #RouterBOOT auto realloc flag value address. Kernel size is limited < 6M !
 TEXT_BASE2 := 0x01100000
 #fat kernels start size 5M

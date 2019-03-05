@@ -10,12 +10,14 @@ DEBUG=true
 	OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
 	#CPU IPQ-4019(RB450Gx4)
 	CPU_TYPE=IPQ4XXX
+	TEXT_BASE=0x84800000
 	UART=1
 }
 [ ${IPQ_NUMBER} -eq 8 ] && {
 	OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq806x
 	#CPU IPQ-8064(RB3011)
 	CPU_TYPE=IPQ806X
+	TEXT_BASE=0x44800000
 	UART=7
 }
 
@@ -49,7 +51,7 @@ export CROSS_COMPILE=arm-openwrt-linux-
 #cat $KERNEL_IMAGE >> ./b1.bin
 #export KERNEL_IMAGE=./b1.bin
 
-make DEBUG=${DEBUG} CPU_TYPE=${CPU_TYPE} UART=${UART} $@
+make DEBUG=${DEBUG} CPU_TYPE=${CPU_TYPE} TEXT_BASE=${TEXT_BASE} UART=${UART} $@
 
 [ -f ${RES_FILE} -a -d ${TFTPBOOT} ] && {
 	cat ${RES_FILE} > ${TFTPBOOT}/${FAKEFNAME}
