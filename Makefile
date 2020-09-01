@@ -1,7 +1,7 @@
 #
 # Auxiliary kernel loader for Qualcom IPQ-4XXX/806X based boards
 #
-#  Copyright (C) 2019 Sergey Sergeev <adron@mstnt.com>
+#  Copyright (C) 2019-2020 Sergey Sergeev <adron@mstnt.com>
 #
 #  This program is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU General Public License version 2 as published
@@ -17,10 +17,14 @@ TEXT_BASE2 := 0x01100000
 FAT_SIZE_START := 5000000
 #for fat kernels <= 12M
 TEXT_BASE2_FAT := 0x00000000
+#enable or disable UART output
+UART := NONE
 
 #ubi image vars
 BLOCKSIZE := 256k
-PAGESIZE  := 4096
+PAGESIZE	:= 4096
+LEBSIZE		:= 253952
+LEBCOUNT	:= 60
 
 CC      := $(CROSS_COMPILE)gcc
 LD      := $(CROSS_COMPILE)ld
@@ -46,7 +50,7 @@ endif
 
 #Com port number(for printf)
 ifeq ($(UART),)
-  CFLAGS += -DUARTx_DM_BASE=UART1_DM_BASE
+  CFLAGS += -DUARTx_DM_BASE=NONE
 else
 ifeq ($(UART),NONE)
   CFLAGS += -DUARTx_DM_BASE=NONE
@@ -107,6 +111,11 @@ elf: $(ldr-elf)
 ubi: $(ldr-ubi)
 all: $(ldr-ubi)
 
+#test leb values
+lebtest:
+	@echo LEBSIZE=!$(LEBSIZE)!
+	@echo LEBCOUNT=!$(LEBCOUNT)!
+
 # Don't build dependencies, this may die if $(CC) isn't gcc
 dep:
 
@@ -152,7 +161,7 @@ $(ldr-ubifs): $(ldr-elf)
 	mkdir ubi/ubifs-rootdir
 	cp bin/loader.elf ubi/ubifs-rootdir/kernel
 	$(STAGING_DIR_HOST)/bin/mkfs.ubifs \
-		-m $(PAGESIZE) -e 253952 -c 60 --compr=none \
+		-m $(PAGESIZE) -e $(LEBSIZE) -c $(LEBCOUNT) --compr=none \
 		-r ubi/ubifs-rootdir $(ldr-ubifs)
 	rm -Rf ubi/ubifs-rootdir
 

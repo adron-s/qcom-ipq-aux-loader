@@ -1,7 +1,7 @@
 #
 # Auxiliary kernel loader for Qualcom IPQ-4XXX/806X based boards
 #
-# Copyright (C) 2019 Sergey Sergeev <adron@mstnt.com>
+# Copyright (C) 2019-2020 Sergey Sergeev <adron@mstnt.com>
 #
 # Some parts of this code was based on the OpenWrt specific lzma-loader
 # for the Atheros AR7XXX/AR9XXX based boards:
@@ -34,13 +34,22 @@ $(PKG_BUILD_DIR)/.prepared:
 	touch $@
 
 CPU_TYPE := UNKNOWN
+UART := NONE
 
 ifeq ($(PLATFORM),mikrotik-ipq4xxx)
-  CPU_TYPE := IPQ4XXX
-  TEXT_BASE := 0x84800000
-  TEXT_BASE2 := 0x01100000
-  FAT_SIZE_START := 5000000
-  TEXT_BASE2_FAT := 0x00000000
+	CPU_TYPE := IPQ4XXX
+	TEXT_BASE := 0x84800000
+	TEXT_BASE2 := 0x01100000
+	FAT_SIZE_START := 5000000
+	TEXT_BASE2_FAT := 0x00000000
+endif
+
+ifeq ($(PLATFORM),mikrotik-ipq806x)
+	CPU_TYPE := IPQ806X
+	TEXT_BASE := 0x44800000
+	TEXT_BASE2 := 0x01100000
+	FAT_SIZE_START := 5000000
+	TEXT_BASE2_FAT := 0x00000000
 endif
 
 loader-compile: $(PKG_BUILD_DIR)/.prepared
@@ -50,6 +59,8 @@ loader-compile: $(PKG_BUILD_DIR)/.prepared
 		TEXT_BASE2_FAT=$(TEXT_BASE2_FAT) 													\
 		CPU_TYPE=$(CPU_TYPE) KERNEL_IMAGE=$(LOADER_DATA)					\
 		BLOCKSIZE=$(BLOCKSIZE) PAGESIZE=$(PAGESIZE) 							\
+		AUTOLEBS=$(AUTOLEBS)																			\
+		UART=$(UART)																							\
 		clean $(LOADER_TYPE)
 
 loader.elf: $(PKG_BUILD_DIR)/bin/loader.elf
