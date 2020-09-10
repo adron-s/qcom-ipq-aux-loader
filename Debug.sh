@@ -5,6 +5,7 @@ IPQ_NUMBER=8
 
 #Uncomment this to see debug messages
 DEBUG=false
+RB3011_PREINITS=NONE
 
 [ ${IPQ_NUMBER} -eq 4 ] && {
 	OPENWRT_DIR=/home/prog/openwrt/lede-all/2019-openwrt-all/openwrt-ipq4xxx
@@ -22,6 +23,7 @@ DEBUG=false
 	TEXT_BASE=0x44800000
 	UART=7
 #	UART=NONE
+	RB3011_PREINITS=YES
 }
 
 TFTPBOOT="/var/lib/tftpboot"
@@ -58,7 +60,7 @@ export CROSS_COMPILE=arm-openwrt-linux-
 #export KERNEL_IMAGE=./b1.bin
 
 make clean
-make DEBUG=${DEBUG} CPU_TYPE=${CPU_TYPE} TEXT_BASE=${TEXT_BASE} UART=${UART} $@
+make DEBUG=${DEBUG} CPU_TYPE=${CPU_TYPE} TEXT_BASE=${TEXT_BASE} UART=${UART} RB3011_PREINITS=${RB3011_PREINITS} $@
 #make DEBUG=${DEBUG} CPU_TYPE=${CPU_TYPE} TEXT_BASE=${TEXT_BASE} UART=${UART} BLOCKSIZE=128k PAGESIZE=2048 LEBSIZE=126976 LEBCOUNT=120 $@
 
 [ -f ${RES_FILE} -a -d ${TFTPBOOT} ] && {
